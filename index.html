@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Ludo Game Clone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        h2 { margin-top: 0; color: #333; }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .player-box {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .red-text { color: #e74c3c; }
+        .green-text { color: #2ecc71; }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            background-color: #333;
+            padding: 8px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background-color: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .token {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .token.Red { background-color: #e74c3c; }
+        .token.Green { background-color: #2ecc71; }
+
+        .dice-area {
+            margin-top: 15px;
+        }
+
+        .dice-display {
+            font-size: 40px;
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            background: #2c3e50;
+            color: #fff;
+            border-radius: 10px;
+            margin: 10px auto;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        .log-box {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #555;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <h2>Ludo Prototype (8 Sixes Max)</h2>
+
+    <div class="stats-container">
+        <div class="player-box red-text">
+            Player Red<br>
+            6s Used: <span id="six-red">0</span>/8
+        </div>
+        <div class="player-box green-text">
+            Player Green<br>
+            6s Used: <span id="six-green">0</span>/8
+        </div>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="dice-area">
+        <div>Current Turn: <b id="current-turn" class="red-text">Red</b></div>
+        <div class="dice-display" id="dice-val">-</div>
+        <button id="roll-btn" onclick="playTurn()">Roll Dice</button>
+    </div>
+
+    <div class="log-box" id="game-log">Game Start! Roll dice to play.</div>
+</div>
+
+<script>
+    const TOTAL_CELLS = 20;
+    const MAX_SIXES = 8;
+
+    const players = ['Red', 'Green'];
+    let turnIndex = 0;
+
+    const sixCount = { Red: 0, Green: 0 };
+    const positions = { Red: 0, Green: 0 };
+
+    // Initialize board UI
+    const boardEl = document.getElementById('board');
+    function createBoard() {
+        boardEl.innerHTML = '';
+        for (let i = 1; i <= TOTAL_CELLS; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.id = `cell-${i}`;
+            cell.innerText = i;
+            boardEl.appendChild(cell);
+        }
+        updateTokenUI();
+    }
+
+    function updateTokenUI() {
+        document.querySelectorAll('.token').forEach(t => t.remove());
+        
+        players.forEach(p => {
+            if (positions[p] > 0 && positions[p] <= TOTAL_CELLS) {
+                const cell = document.getElementById(`cell-${positions[p]}`);
+                const token = document.createElement('div');
+                token.className = `token ${p}`;
+                cell.appendChild(token);
+            }
+        });
+    }
+
+    function rollDiceCustom(player) {
+        let result;
+        // Strict Custom Rule Check
+        if (sixCount[player] >= MAX_SIXES) {
+            result = Math.floor(Math.random() * 5) + 1; // 1 to 5 only
+        } else {
+            result = Math.floor(Math.random() * 6) + 1; // 1 to 6
+            if (result === 6) {
+                sixCount[player] += 1;
+            }
+        }
+        return result;
+    }
+
+    function playTurn() {
+        const currentPlayer = players[turnIndex];
+        const diceVal = rollDiceCustom(currentPlayer);
+
+        document.getElementById('dice-val').innerText = diceVal;
+        document.getElementById(`six-${currentPlayer.toLowerCase()}`).innerText = sixCount[currentPlayer];
+
+        let logText = `${currentPlayer} rolled a ${diceVal}.`;
+
+        if (diceVal === 6 && sixCount[currentPlayer] >= MAX_SIXES) {
+            logText += " (Note: Max 6 limit reached!)";
+        }
+
+        // Move logic
+        positions[currentPlayer] += diceVal;
+        if (positions[currentPlayer] >= TOTAL_CELLS) {
+            positions[currentPlayer] = TOTAL_CELLS;
+            logText = `🎉 Player ${currentPlayer} won the game!`;
+            document.getElementById('roll-btn').disabled = true;
+        }
+
+        document.getElementById('game-log').innerText = logText;
+        updateTokenUI();
+
+        // Switch turn if no winner
+        if (positions[currentPlayer] < TOTAL_CELLS) {
+            turnIndex = (turnIndex + 1) % players.length;
+            const nextPlayer = players[turnIndex];
+            const turnEl = document.getElementById('current-turn');
+            turnEl.innerText = nextPlayer;
+            turnEl.className = nextPlayer === 'Red' ? 'red-text' : 'green-text';
+        }
+    }
+
+    createBoard();
+</script>
+
+</body>
+</html>
