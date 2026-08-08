@@ -2,242 +2,272 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Featured 3D Ludo King</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Real Ludo King UI</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0284c7;
+            background-image: radial-gradient(#0369a1 2px, transparent 2px);
+            background-size: 16px 16px;
             color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             min-height: 100vh;
             padding: 10px;
             user-select: none;
+            overflow: hidden;
         }
 
-        /* Mode Selection Modal */
+        /* Player Mode Selection Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 100;
         }
         .modal-card {
-            background: #1e293b;
-            padding: 25px;
+            background: #0f172a;
+            padding: 24px;
             border-radius: 16px;
             text-align: center;
-            max-width: 360px;
+            max-width: 320px;
             width: 90%;
-            border: 2px solid #3b82f6;
+            border: 3px solid #f59e0b;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        .modal-card h2 { color: #f59e0b; margin-bottom: 15px; }
+        .modal-card h2 { color: #f59e0b; margin-bottom: 15px; font-size: 20px; }
         .mode-btn {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
-            border: none;
-            padding: 12px 20px;
-            margin: 6px 0;
+            border: 2px solid #60a5fa;
+            padding: 12px;
+            margin: 8px 0;
             width: 100%;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .mode-btn:hover { transform: translateY(-2deg); }
 
-        .game-card { max-width: 450px; width: 100%; text-align: center; }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
-            font-size: 11px;
-        }
-        .stat-item {
-            background: #1e293b;
-            padding: 6px 2px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        .s-red { border-bottom: 4px solid #ef4444; }
-        .s-green { border-bottom: 4px solid #22c55e; }
-        .s-yellow { border-bottom: 4px solid #eab308; }
-        .s-blue { border-bottom: 4px solid #3b82f6; }
-
-        /* Ludo Board Grid */
-        #ludo-board {
+        /* Header Player Cards */
+        .top-bar {
             width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .p-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid #38bdf8;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Main Ludo Board */
+        .board-container {
+            width: 100%;
+            max-width: 420px;
             aspect-ratio: 1;
+            background: #fff;
+            border-radius: 12px;
+            border: 5px solid #1e293b;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.5);
             display: grid;
             grid-template-columns: repeat(15, 1fr);
             grid-template-rows: repeat(15, 1fr);
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            border: 4px solid #334155;
             position: relative;
         }
 
         .cell {
             border: 0.5px solid #cbd5e1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        /* Color Sections */
+        .yard-green { background: #16a34a !important; }
+        .yard-yellow { background: #eab308 !important; }
+        .yard-red { background: #dc2626 !important; }
+        .yard-blue { background: #2563eb !important; }
+
+        .yard-box {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            background: #fff;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            padding: 8px;
+            gap: 8px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .yard-spot {
+            background: #f1f5f9;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            background: #fff;
-            font-size: 12px;
         }
 
-        /* Yards & Special Paths */
-        .yard-red { background: #ef4444 !important; }
-        .yard-green { background: #22c55e !important; }
-        .yard-yellow { background: #eab308 !important; }
-        .yard-blue { background: #3b82f6 !important; }
-        .center-home { background: conic-gradient(#ef4444 0 90deg, #22c55e 90deg 180deg, #3b82f6 180deg 270deg, #eab308 270deg 360deg) !important; }
+        .center-home {
+            background: conic-gradient(#16a34a 0 90deg, #eab308 90deg 180deg, #2563eb 180deg 270deg, #dc2626 270deg 360deg) !important;
+        }
 
-        .hr-red { background: #fca5a5 !important; }
-        .hr-green { background: #86efac !important; }
-        .hr-yellow { background: #fef08a !important; }
-        .hr-blue { background: #93c5fd !important; }
+        .path-red { background: #fca5a5 !important; }
+        .path-green { background: #86efac !important; }
+        .path-yellow { background: #fef08a !important; }
+        .path-blue { background: #93c5fd !important; }
 
-        .safe-star::after {
-            content: '⭐';
-            font-size: 14px;
+        /* Symbols & Arrows */
+        .star-icon::after { content: '☆'; font-size: 18px; color: #475569; font-weight: bold; }
+        .arrow-up::after { content: '↑'; font-size: 16px; color: #dc2626; font-weight: bold; }
+        .arrow-right::after { content: '→'; font-size: 16px; color: #16a34a; font-weight: bold; }
+        .arrow-down::after { content: '↓'; font-size: 16px; color: #eab308; font-weight: bold; }
+        .arrow-left::after { content: '←'; font-size: 16px; color: #2563eb; font-weight: bold; }
+
+        /* SVG Pin Gotiyan (Exact Image Look) */
+        .goti-pin {
+            width: 22px;
+            height: 28px;
             position: absolute;
-            z-index: 1;
-            opacity: 0.7;
-        }
-
-        /* Token / Goti Styling */
-        .token {
-            width: 75%;
-            height: 75%;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            position: absolute;
-            z-index: 10;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            z-index: 20;
             cursor: pointer;
-            transition: all 0.2s ease;
+            filter: drop-shadow(0px 3px 2px rgba(0,0,0,0.5));
+            transition: transform 0.15s ease, top 0.2s, left 0.2s;
         }
-        .token-RED { background: radial-gradient(circle at 30% 30%, #f87171, #b91c1c); }
-        .token-GREEN { background: radial-gradient(circle at 30% 30%, #4ade80, #15803d); }
-        .token-YELLOW { background: radial-gradient(circle at 30% 30%, #facc15, #a16207); }
-        .token-BLUE { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8); }
-
-        /* Highlight Clickable Tokens */
-        .token-active {
-            animation: bounce 0.6s infinite alternate;
-            border: 2px solid #f59e0b !important;
-            box-shadow: 0 0 10px #f59e0b;
+        
+        .goti-active {
+            animation: bouncePin 0.5s infinite alternate;
+            z-index: 30;
         }
 
-        @keyframes bounce {
-            from { transform: scale(1); }
-            to { transform: scale(1.25); }
+        @keyframes bouncePin {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-8px) scale(1.15); }
         }
 
-        /* Controls */
-        .controls {
-            margin-top: 12px;
-            background: #1e293b;
-            padding: 12px;
-            border-radius: 12px;
-        }
-
-        .dice-box {
-            font-size: 32px;
-            font-weight: bold;
-            width: 55px;
-            height: 55px;
-            line-height: 55px;
-            background: #0f172a;
-            color: #f59e0b;
-            margin: 8px auto;
-            border-radius: 8px;
-            border: 2px solid #334155;
-        }
-
-        .roll-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
+        /* Bottom Controls Bar (Image Style) */
+        .bottom-bar {
             width: 100%;
+            max-width: 420px;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid #38bdf8;
+            margin-top: 10px;
         }
-        .roll-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .status { font-size: 13px; color: #cbd5e1; margin-top: 6px; }
+        .player-turn-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .dice-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dice-btn {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: #0f172a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 3px solid #cbd5e1;
+            cursor: pointer;
+        }
+
+        .roll-btn-main {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            border: none;
+            color: #0f172a;
+            font-weight: bold;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .roll-btn-main:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
 
+<!-- Player Select Modal -->
 <div class="modal-overlay" id="start-modal">
     <div class="modal-card">
-        <h2>🎮 Select Players</h2>
+        <h2>🎮 Choose Players Mode</h2>
         <button class="mode-btn" onclick="startGame(2)">2 Players (Red vs Yellow)</button>
         <button class="mode-btn" onclick="startGame(3)">3 Players (Red, Green, Yellow)</button>
         <button class="mode-btn" onclick="startGame(4)">4 Players (All Colors)</button>
     </div>
 </div>
 
-<div class="game-card">
-    <h3 style="color:#f59e0b; margin-bottom: 8px;">Ludo King Clone</h3>
+<div class="top-bar">
+    <div class="p-card" id="card-red">🔴 Red: <span id="six-RED">0</span>/8</div>
+    <div class="p-card" id="card-yellow">🟡 Yellow: <span id="six-YELLOW">0</span>/8</div>
+</div>
 
-    <div class="stats-bar">
-        <div class="stat-item s-red" id="box-red">Red 6s: <span id="six-red">0</span>/8</div>
-        <div class="stat-item s-green" id="box-green">Green 6s: <span id="six-green">0</span>/8</div>
-        <div class="stat-item s-yellow" id="box-yellow">Yellow 6s: <span id="six-yellow">0</span>/8</div>
-        <div class="stat-item s-blue" id="box-blue">Blue 6s: <span id="six-blue">0</span>/8</div>
+<div class="board-container" id="board"></div>
+
+<div class="bottom-bar">
+    <div class="player-turn-box">
+        <span id="turn-indicator-dot" style="font-size: 20px;">🔴</span>
+        <span id="turn-text" style="color:#f87171;">RED'S TURN</span>
     </div>
-
-    <div id="ludo-board"></div>
-
-    <div class="controls">
-        <div>Current Turn: <b id="turn-txt" style="color:#ef4444;">RED</b></div>
-        <div class="dice-box" id="dice-box">-</div>
-        <button class="roll-btn" id="roll-btn" onclick="rollTurn()">🎲 Roll Dice</button>
-        <div class="status" id="status-msg">Roll dice to start game!</div>
+    <div class="dice-container">
+        <div class="dice-btn" id="dice-display">🎲</div>
+        <button class="roll-btn-main" id="roll-btn" onclick="rollDice()">ROLL</button>
     </div>
 </div>
 
 <script>
-    // Audio Synthesizer
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-    function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); }
-    function playSound(freq, duration) {
-        initAudio();
-        if (!audioCtx) return;
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    // Pin Goti SVG Generator
+    function createPinSVG(colorHex) {
+        return `
+        <svg viewBox="0 0 32 42" width="100%" height="100%">
+            <path d="M16 0 C7.16 0 0 7.16 0 16 C0 28 16 42 16 42 C16 42 32 28 32 16 C32 7.16 24.84 0 16 0 Z" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+            <circle cx="16" cy="15" r="9" fill="${colorHex}"/>
+            <circle cx="13" cy="12" r="3" fill="#ffffff" opacity="0.6"/>
+        </svg>`;
     }
 
-    // Board Map & Track Loops
-    const boardEl = document.getElementById('ludo-board');
-    const cells = {};
+    const colorHexes = { RED: '#dc2626', GREEN: '#16a34a', YELLOW: '#eab308', BLUE: '#2563eb' };
     
-    // 52 Common Outer Track Cells Coordinates (r_c)
+    // 52 Step Track (Grid r_c)
     const trackCoords = [
         '14_7', '13_7', '12_7', '11_7', '10_7', '9_6', '9_5', '9_4', '9_3', '9_2', '9_1',
         '8_1', '7_1', '7_2', '7_3', '7_4', '7_5', '7_6', '6_7', '5_7', '4_7', '3_7', '2_7', '1_7',
@@ -246,7 +276,6 @@
         '15_8', '15_7'
     ];
 
-    // Home paths for each color
     const homePaths = {
         RED: ['14_8', '13_8', '12_8', '11_8', '10_8', '9_8'],
         GREEN: ['8_2', '8_3', '8_4', '8_5', '8_6', '8_7'],
@@ -255,24 +284,22 @@
     };
 
     const startOffsets = { RED: 0, GREEN: 13, YELLOW: 26, BLUE: 39 };
-    const safeCellIndices = [0, 8, 13, 21, 26, 34, 39, 47]; // Safe Star Locations
+    const safeIndices = [0, 8, 13, 21, 26, 34, 39, 47]; // Safe stars
 
-    // Fixed Yard Spot Coordinates for 4 Gotiyan each
-    const yardSpots = {
-        RED: ['2_2', '2_5', '5_2', '5_5'],
-        GREEN: ['2_11', '2_14', '5_11', '5_14'],
-        YELLOW: ['11_2', '11_5', '14_2', '14_5'],
-        BLUE: ['11_11', '11_14', '14_11', '14_14']
+    const yardSpotCoords = {
+        RED: ['12_2', '12_4', '14_2', '14_4'],
+        GREEN: ['2_2', '2_4', '4_2', '4_4'],
+        YELLOW: ['2_12', '2_14', '4_12', '4_14'],
+        BLUE: ['12_12', '12_14', '14_12', '14_14']
     };
 
-    let activePlayers = ['RED', 'GREEN', 'YELLOW', 'BLUE'];
-    const colors = { RED: '#ef4444', GREEN: '#22c55e', YELLOW: '#eab308', BLUE: '#3b82f6' };
+    let activePlayers = ['RED', 'YELLOW'];
     let turnIdx = 0;
-    let currentDice = 0;
-    let awaitTokenClick = false;
+    let diceVal = 0;
+    let awaitingMove = false;
+    const sixCounts = { RED: 0, GREEN: 0, YELLOW: 0, BLUE: 0 };
 
-    const sixCount = { RED: 0, GREEN: 0, YELLOW: 0, BLUE: 0 };
-    // Token Positions: -1 = Yard, 0..50 = Main Track, 51..56 = Home Path, 57 = Finished
+    // -1 = In Yard, 0-50 = Track, 51-56 = Home Stretch
     const tokens = {
         RED: [-1, -1, -1, -1],
         GREEN: [-1, -1, -1, -1],
@@ -280,18 +307,18 @@
         BLUE: [-1, -1, -1, -1]
     };
 
-    function startGame(count) {
-        if (count === 2) activePlayers = ['RED', 'YELLOW'];
-        else if (count === 3) activePlayers = ['RED', 'GREEN', 'YELLOW'];
-        else activePlayers = ['RED', 'GREEN', 'YELLOW', 'BLUE'];
+    const boardEl = document.getElementById('board');
+    const cells = {};
 
-        ['RED', 'GREEN', 'YELLOW', 'BLUE'].forEach(p => {
-            document.getElementById(`box-${p.toLowerCase()}`).style.opacity = activePlayers.includes(p) ? '1' : '0.2';
-        });
+    function startGame(num) {
+        if (num === 2) activePlayers = ['RED', 'YELLOW'];
+        else if (num === 3) activePlayers = ['RED', 'GREEN', 'YELLOW'];
+        else activePlayers = ['RED', 'GREEN', 'YELLOW', 'BLUE'];
 
         document.getElementById('start-modal').style.display = 'none';
         buildBoard();
         renderTokens();
+        updateTurnUI();
     }
 
     function buildBoard() {
@@ -302,21 +329,28 @@
                 cell.className = 'cell';
                 const key = `${r}_${c}`;
 
-                if (r <= 6 && c <= 6) cell.classList.add('yard-red');
-                else if (r <= 6 && c >= 10) cell.classList.add('yard-green');
-                else if (r >= 10 && c <= 6) cell.classList.add('yard-yellow');
+                // Color Yards
+                if (r <= 6 && c <= 6) cell.classList.add('yard-green');
+                else if (r <= 6 && c >= 10) cell.classList.add('yard-yellow');
+                else if (r >= 10 && c <= 6) cell.classList.add('yard-red');
                 else if (r >= 10 && c >= 10) cell.classList.add('yard-blue');
                 else if (r >= 7 && r <= 9 && c >= 7 && c <= 9) cell.classList.add('center-home');
 
-                if (r === 8 && c >= 2 && c <= 6) cell.classList.add('hr-green');
-                if (c === 8 && r >= 2 && r <= 6) cell.classList.add('hr-yellow');
-                if (r === 8 && c >= 10 && c <= 14) cell.classList.add('hr-blue');
-                if (c === 8 && r >= 10 && r <= 14) cell.classList.add('hr-red');
+                // Paths
+                if (r === 8 && c >= 2 && c <= 6) cell.classList.add('path-green');
+                if (c === 8 && r >= 2 && r <= 6) cell.classList.add('path-yellow');
+                if (r === 8 && c >= 10 && c <= 14) cell.classList.add('path-blue');
+                if (c === 8 && r >= 10 && r <= 14) cell.classList.add('path-red');
 
-                // Mark Safe Star cells
+                // Special Symbols
+                if (key === '14_7') cell.classList.add('arrow-up');
+                if (key === '7_2') cell.classList.add('arrow-right');
+                if (key === '2_9') cell.classList.add('arrow-down');
+                if (key === '9_14') cell.classList.add('arrow-left');
+
                 let trackIdx = trackCoords.indexOf(key);
-                if (trackIdx !== -1 && safeCellIndices.includes(trackIdx)) {
-                    cell.classList.add('safe-star');
+                if (trackIdx !== -1 && safeIndices.includes(trackIdx)) {
+                    cell.classList.add('star-icon');
                 }
 
                 boardEl.appendChild(cell);
@@ -325,8 +359,8 @@
         }
     }
 
-    function getCellKey(player, posIdx, tIndex) {
-        if (posIdx === -1) return yardSpots[player][tIndex];
+    function getCellKey(player, posIdx, tIdx) {
+        if (posIdx === -1) return yardSpotCoords[player][tIdx];
         if (posIdx >= 0 && posIdx <= 50) {
             let absIdx = (startOffsets[player] + posIdx) % 52;
             return trackCoords[absIdx];
@@ -334,103 +368,95 @@
         if (posIdx >= 51 && posIdx <= 56) {
             return homePaths[player][posIdx - 51];
         }
-        return '8_8'; // Center Home
+        return '8_8';
     }
 
     function renderTokens() {
-        document.querySelectorAll('.token').forEach(t => t.remove());
+        document.querySelectorAll('.goti-pin').forEach(el => el.remove());
 
         activePlayers.forEach(p => {
             tokens[p].forEach((pos, idx) => {
-                let cellKey = getCellKey(p, pos, idx);
-                if (cells[cellKey]) {
-                    let t = document.createElement('div');
-                    t.className = `token token-${p}`;
-                    t.dataset.player = p;
-                    t.dataset.tokenIdx = idx;
+                let key = getCellKey(p, pos, idx);
+                if (cells[key]) {
+                    let pin = document.createElement('div');
+                    pin.className = `goti-pin`;
+                    pin.innerHTML = createPinSVG(colorHexes[p]);
 
-                    // Add highlight if active turn and movable
-                    if (awaitTokenClick && p === activePlayers[turnIdx] && canMoveToken(p, idx, currentDice)) {
-                        t.classList.add('token-active');
-                        t.onclick = () => onTokenClick(p, idx);
+                    if (awaitingMove && p === activePlayers[turnIdx] && canMove(p, idx, diceVal)) {
+                        pin.classList.add('goti-active');
+                        pin.onclick = () => moveToken(p, idx);
                     }
 
-                    cells[cellKey].appendChild(t);
+                    cells[key].appendChild(pin);
                 }
             });
         });
     }
 
-    function canMoveToken(player, tIdx, dice) {
-        let pos = tokens[player][tIdx];
-        if (pos === -1) return dice === 6; // Lock opens only on 6
-        if (pos + dice <= 57) return true;
+    function canMove(player, tIdx, val) {
+        let p = tokens[player][tIdx];
+        if (p === -1) return val === 6; // Lock opens only on 6
+        if (p + val <= 56) return true;
         return false;
     }
 
-    function rollTurn() {
-        if (awaitTokenClick) return;
+    function rollDice() {
+        if (awaitingMove) return;
 
         const p = activePlayers[turnIdx];
-        playSound(300, 0.1);
+        const btn = document.getElementById('roll-btn');
+        btn.disabled = true;
 
-        // Custom 8-Six Limit Rule
-        if (sixCount[p] >= 8) {
-            currentDice = Math.floor(Math.random() * 5) + 1;
+        // Roll logic with 8-Six Limit
+        if (sixCounts[p] >= 8) {
+            diceVal = Math.floor(Math.random() * 5) + 1;
         } else {
-            currentDice = Math.floor(Math.random() * 6) + 1;
-            if (currentDice === 6) sixCount[p]++;
+            diceVal = Math.floor(Math.random() * 6) + 1;
+            if (diceVal === 6) sixCounts[p]++;
         }
 
-        document.getElementById('dice-box').innerText = currentDice;
-        document.getElementById(`six-${p.toLowerCase()}`).innerText = sixCount[p];
+        document.getElementById('dice-display').innerText = diceVal;
+        if (document.getElementById(`six-${p}`)) {
+            document.getElementById(`six-${p}`).innerText = sixCounts[p];
+        }
 
-        // Check movable tokens
-        let movable = tokens[p].some((_, idx) => canMoveToken(p, idx, currentDice));
+        let hasValidMove = tokens[p].some((_, i) => canMove(p, i, diceVal));
 
-        if (!movable) {
-            document.getElementById('status-msg').innerText = `${p} rolled ${currentDice}. No valid move!`;
-            setTimeout(nextTurn, 1000);
+        if (!hasValidMove) {
+            setTimeout(nextTurn, 800);
         } else {
-            awaitTokenClick = true;
-            document.getElementById('status-msg').innerText = `${p} rolled ${currentDice}. Tap a goti to move!`;
-            document.getElementById('roll-btn').disabled = true;
+            awaitingMove = true;
             renderTokens();
         }
     }
 
-    function onTokenClick(player, tIdx) {
-        if (!awaitTokenClick) return;
+    function moveToken(player, tIdx) {
+        if (!awaitingMove) return;
 
-        let currentPos = tokens[player][tIdx];
-        
-        if (currentPos === -1 && currentDice === 6) {
-            tokens[player][tIdx] = 0; // Move out to start cell
-            playSound(600, 0.15);
-        } else if (currentPos >= 0) {
-            tokens[player][tIdx] += currentDice;
-            playSound(450, 0.1);
+        let curPos = tokens[player][tIdx];
+
+        if (curPos === -1 && diceVal === 6) {
+            tokens[player][tIdx] = 0; // Move out to start
+        } else if (curPos >= 0) {
+            tokens[player][tIdx] += diceVal;
         }
 
         let newPos = tokens[player][tIdx];
 
-        // Cutting / Kill Logic Check
-        let cutOccurred = false;
+        // Cutting / Kill Opponent Goti
+        let hasCut = false;
         if (newPos >= 0 && newPos <= 50) {
-            let landingCell = getCellKey(player, newPos, tIdx);
-            let absIdx = trackCoords.indexOf(landingCell);
+            let landKey = getCellKey(player, newPos, tIdx);
+            let absIdx = trackCoords.indexOf(landKey);
 
-            // Cut only if NOT on Safe Star Cell
-            if (!safeCellIndices.includes(absIdx)) {
+            if (!safeIndices.includes(absIdx)) {
                 activePlayers.forEach(opp => {
                     if (opp !== player) {
                         tokens[opp].forEach((oppPos, oppTIdx) => {
                             if (oppPos >= 0 && oppPos <= 50) {
-                                if (getCellKey(opp, oppPos, oppTIdx) === landingCell) {
-                                    tokens[opp][oppTIdx] = -1; // Send opponent back to yard!
-                                    cutOccurred = true;
-                                    playSound(150, 0.3);
-                                    document.getElementById('status-msg').innerText = `💥 ${player} cut ${opp}'s goti! Extra Turn!`;
+                                if (getCellKey(opp, oppPos, oppTIdx) === landKey) {
+                                    tokens[opp][oppTIdx] = -1; // Send back to yard!
+                                    hasCut = true;
                                 }
                             }
                         });
@@ -439,13 +465,13 @@
             }
         }
 
-        awaitTokenClick = false;
+        awaitingMove = false;
         document.getElementById('roll-btn').disabled = false;
         renderTokens();
 
-        // Extra turn on 6 or Goti Cut
-        if (currentDice === 6 || cutOccurred) {
-            document.getElementById('status-msg').innerText += " Roll again!";
+        if (diceVal === 6 || hasCut) {
+            // Extra Turn on 6 or Cut
+            document.getElementById('roll-btn').disabled = false;
         } else {
             nextTurn();
         }
@@ -453,11 +479,17 @@
 
     function nextTurn() {
         turnIdx = (turnIdx + 1) % activePlayers.length;
-        const nextP = activePlayers[turnIdx];
-        const turnTxt = document.getElementById('turn-txt');
-        turnTxt.innerText = nextP;
-        turnTxt.style.color = colors[nextP];
-        document.getElementById('status-msg').innerText = `Turn: ${nextP}`;
+        updateTurnUI();
+        document.getElementById('roll-btn').disabled = false;
+        document.getElementById('dice-display').innerText = '🎲';
+    }
+
+    function updateTurnUI() {
+        const p = activePlayers[turnIdx];
+        const dots = { RED: '🔴', GREEN: '🟢', YELLOW: '🟡', BLUE: '🔵' };
+        document.getElementById('turn-indicator-dot').innerText = dots[p];
+        document.getElementById('turn-text').innerText = `${p}'S TURN`;
+        document.getElementById('turn-text').style.color = colorHexes[p];
     }
 </script>
 
